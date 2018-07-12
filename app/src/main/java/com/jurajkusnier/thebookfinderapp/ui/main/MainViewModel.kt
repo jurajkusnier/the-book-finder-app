@@ -12,7 +12,13 @@ class MainViewModel(private val bookRepository: BookRepository) : ViewModel( ) {
     val results: LiveData<GoogleBooksResult>
         get() = _results
 
+    var searchName = ""
+
     fun findBooks(name:String) {
+        if (searchName  == name) return
+
+        searchName = name
+
         val disposable = bookRepository.findBooks(name)?.subscribe {
             _results.value = it
         }
