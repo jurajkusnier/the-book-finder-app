@@ -1,5 +1,8 @@
 package com.jurajkusnier.thebookfinderapp.ui.main
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.jurajkusnier.thebookfinderapp.R
 import com.jurajkusnier.thebookfinderapp.data.api.BooksApiService
+import com.jurajkusnier.thebookfinderapp.data.model.GoogleBooksResult
+import com.jurajkusnier.thebookfinderapp.data.repository.BookRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Retrofit
@@ -32,29 +37,27 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProviders.of(this,object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                val retrofit = Retrofit.Builder()
+                        .baseUrl("https://www.googleapis.com/")
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
 
+                val service = retrofit.create<BooksApiService>(BooksApiService::class.java)
 
-        testAPI()
+                val repository = BookRepository(service)
 
+                return MainViewModel(repository) as T
+            }
+
+        }).get(MainViewModel::class.java)
+
+        viewModel.findBooks("book")
+
+        viewModel.results.observe(this, Observer<GoogleBooksResult> {
+            Log.d(TAG,it.toString())
+        })
     }
-
-    fun testAPI() {
-        val retrofit = Retrofit.Builder()
-                .baseUrl("https://www.googleapis.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-        val service = retrofit.create<BooksApiService>(BooksApiService::class.java)
-
-        val disposable = service.listBooks("book")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    Log.d(TAG,it.items.toString())
-                }
-    }
-
 }
