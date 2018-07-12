@@ -20,7 +20,7 @@ class BooksListAdapter(val books:List<Item>): RecyclerView.Adapter<BooksListAdap
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.view.textBookName.text = books[position].volumeInfo.title
-        holder.view.textAuthors.text = books[position].volumeInfo.authors.joinToString()
+        holder.view.textAuthors.text = books[position].volumeInfo.authors?.joinToString()
 
         GlideApp.with(holder.view).load(books[position].volumeInfo.imageLinks.thumbnail).into(holder.view.imageBookCover)
     }
