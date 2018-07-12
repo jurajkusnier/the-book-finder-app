@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import com.jurajkusnier.thebookfinderapp.data.model.GoogleBooksResult
 import com.jurajkusnier.thebookfinderapp.data.repository.BookRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.main_fragment.*
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -56,7 +58,13 @@ class MainFragment : Fragment() {
 
         viewModel.findBooks("book")
 
+        recycleViewBooks.setHasFixedSize(true)
+        recycleViewBooks.layoutManager = LinearLayoutManager(context)
+
         viewModel.results.observe(this, Observer<GoogleBooksResult> {
+            it?.apply {
+                recycleViewBooks.adapter = BooksListAdapter(items)
+            }
             Log.d(TAG,it.toString())
         })
     }
