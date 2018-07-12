@@ -14,8 +14,8 @@ class MainViewModel(private val bookRepository: BookRepository) : ViewModel( ) {
 
     var searchName = ""
 
-    fun findBooks(name:String) {
-        if (searchName  == name) return
+    fun findBooks(name:String?) {
+        if (name == null || searchName  == name) return
 
         searchName = name
 
