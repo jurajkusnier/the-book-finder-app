@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,8 +16,6 @@ import com.jurajkusnier.thebookfinderapp.R
 import com.jurajkusnier.thebookfinderapp.data.api.BooksApiService
 import com.jurajkusnier.thebookfinderapp.data.model.GoogleBooksResult
 import com.jurajkusnier.thebookfinderapp.data.repository.BookRepository
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.main_fragment.*
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -59,7 +58,10 @@ class MainFragment : Fragment() {
         viewModel.findBooks("book")
 
         recycleViewBooks.setHasFixedSize(true)
-        recycleViewBooks.layoutManager = LinearLayoutManager(context)
+        val layoutManager = LinearLayoutManager(context)
+        recycleViewBooks.layoutManager = layoutManager
+        val dividerItemDecoration = DividerItemDecoration(recycleViewBooks.context, layoutManager.orientation)
+        recycleViewBooks.addItemDecoration(dividerItemDecoration)
 
         viewModel.results.observe(this, Observer<GoogleBooksResult> {
             it?.apply {
